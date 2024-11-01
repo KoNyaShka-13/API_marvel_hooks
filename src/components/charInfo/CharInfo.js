@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import MarvelService from '../../services/MarvelServices';
@@ -8,64 +8,45 @@ import Skeleton from '../skeleton/Skeleton';
 import './charInfo.scss';
 
 
-class CharInfo extends Component {
-
-    state = {
-        char: null,
-        loading: false,
-        error: false
-    }
+const CharInfo = (props) => {
     
-    marvelService = new MarvelService();
+    const [char, setChar] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    
+    const marvelService = new MarvelService();
 
-    componentDidMount() {
-        this.updateChar();
-    }
+   
+    useEffect(() => {
+        updateChar()
+    }, [props.charId])//Обновление происходит по этим параметрам
  
-    componentDidUpdate(prevProps, prevState){//Проверка старых запросов с новыми, чтобы лишний раз не обновлять
-        if (this.props.charId !== prevProps.charId) {//Проверку писать НУЖНО только со сравнением, чтобы не было бесконечных запросов
-            this.updateChar();
-        }
-    }
-
     
-
-    updateChar = () => {
-        const {charId} = this.props;
+    const updateChar = () => {
+        const {charId} = props;
         if(!charId) {
             return;
         }
-
-        this.onCharLoading();
-
-        this.marvelService
+        onCharLoading();
+        marvelService
             .getCharacter(charId)
-            .then(this.onCharLoaded)
-            .catch(this.onError);
+            .then(onCharLoaded)
+            .catch(onError)
     }
 
-    onCharLoaded = (char) => {
-        this.setState({
-            char, 
-            loading: false
-        })
+    const onCharLoaded = (char) => {
+            setChar(char); 
+            setLoading(false);
     }
 
-    onCharLoading = () => {
-        this.setState({
-            loading: true
-        })
+    const onCharLoading = () => { 
+            setLoading(true);
     }
 
-    onError = () => {
-        this.setState({ 
-            loading: false,
-            error: true
-        })
+    const onError = () => {
+            setLoading(false);
+            setError(true);
     }
-
-    render() {
-        const {char, loading, error} = this.state;
 
         const skeleton = char || loading || error ? null : <Skeleton/>;//Если ничего нету у нас из списка : ни char, ни loading, ни error, то используется skeleton
         const errorMessage = error ? <ErrorMessage/> : null;//Создаем здесь условия, чтобы не засорять верстку, а так, данную логику разрешено размещать в верстке
@@ -80,7 +61,6 @@ class CharInfo extends Component {
                 {content}
             </div>
         )
-    }
 }
 
 const View = ({char}) => {

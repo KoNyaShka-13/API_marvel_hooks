@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import Spinner from '../Spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import MarvelService from '../../services/MarvelServices';
@@ -6,67 +6,62 @@ import MarvelService from '../../services/MarvelServices';
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 
-class RandomChar extends Component {
+const RandomChar = () => {
     //constructor(props) {//Чтобы новый персонаж отобразился, данный вариант не правильный со стороны семантики, потом его изменю
     //    super(props);
     //    this.updateChar();
     //}
-    state = {
+//    state = {
     //    name: null,
     //    description: null,
     //    thumbnail: null,
     //    homepage: null,
     //    wiki: null
-        char: {},
-        loading: true,
-        error: false
+
+    const [char, setChar] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+//    }
+
+    const marvelService = new MarvelService();//Этим действием создаем новое свойство
+
+    useEffect(() => {
+        updateChar();
+        const timerId = setInterval(updateChar, 60000);
+
+        return () => {
+            clearInterval(timerId)
+        }
+    }, [])
+
+    const onCharLoaded = (char) => { 
+        setLoading(false);
+        setChar(char);    
     }
 
-     marvelService = new MarvelService();//Этим действием создаем новое свойство
-
-     componentDidMount() {
-        this.updateChar();
-        // this.timerId = setInterval(this.updateChar, 15000);
+    const onCharLoading = () => {//При вводе имени персонажа добавляем окно загрузки, чтобы окно не пустовало
+        setLoading(true);
     }
 
-    componentWillUnmount() {
-        clearInterval(this.timerId);
+    const onError = () => { 
+        setLoading(false);
+        setError(true);
     }
 
-    onCharLoaded = (char) => {
-        this.setState({
-            char, 
-            loading: false
-        })
-    }
-
-    onCharLoading = () => {//При вводе имени персонажа добавляем окно загрузки, чтобы окно не пустовало
-        this.setState({
-            loading: true
-        })
-    }
-
-    onError = () => {
-        this.setState({ 
-            loading: false,
-            error: true
-        })
-    }
-
-    updateChar = () => {//Для получения рандомного героя 
+    const updateChar = () => {//Для получения рандомного героя 
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);//Рандомайзер
-        this.onCharLoading();
-        this.marvelService
+        onCharLoading();
+        marvelService
             .getCharacter(id)
-            .then(this.onCharLoaded)//Получаем данные при помощи кода, что в MarbelServices
-            .catch(this.onError);//Ловим ошибку и срабатывает функция onError
+            .then(onCharLoaded)//Получаем данные при помощи кода, что в MarbelServices
+            .catch(onError);//Ловим ошибку и срабатывает функция onError
     }
     
-    render() {//В этой части логика
-        const {char, loading, error} = this.state;//Из свойства char мы вытаскиваем нужные нам свойства именно в данной функции, в другом месте можем вытащить другие свойства
+    //render() {//В этой части логика
+        //const {char, loading, error} = this.state;//Из свойства char мы вытаскиваем нужные нам свойства именно в данной функции, в другом месте можем вытащить другие свойства
         const errorMessage = error ? <ErrorMessage/> : null;//Создаем здесь условия, чтобы не засорять верстку, а так, данную логику разрешено размещать в верстке
         const spinner = loading ? <Spinner/> : null;
-        const content = !(loading || error) ? <View char={char}/> : null;
+        const content = !(loading || error || !char) ? <View char={char}/> : null;
 //        if (loading) {
 //            return <Spinner/>
 //        }
@@ -84,14 +79,13 @@ class RandomChar extends Component {
                 <p className="randomchar__title">
                     Or choose another one
                 </p>
-                <button onClick={this.updateChar} className="button button__main">
+                <button onClick={updateChar} className="button button__main">
                     <div className="inner">try it</div>
                 </button>
                 <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
             </div>
         </div>
     )
-    }
     }
 
     const View = ({char}) => {
