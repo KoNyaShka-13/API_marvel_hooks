@@ -19,7 +19,7 @@ const RandomChar = () => {
     //    wiki: null
 
     const [char, setChar] = useState(null);
-    const  {loading, error, getCharacter} = useMarvelService();//Этим действием создаем новое свойство
+    const  {loading, error, getCharacter, clearError} = useMarvelService();//Этим действием создаем новое свойство
 
     
 
@@ -42,6 +42,7 @@ const RandomChar = () => {
     
 
     const updateChar = () => {//Для получения рандомного героя 
+        clearError();//Поставили очистку ошибки, если она вылезет, дальше будет все обновляться
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);//Рандомайзер
         getCharacter(id)
             .then(onCharLoaded)//Получаем данные при помощи кода, что в MarbelServices

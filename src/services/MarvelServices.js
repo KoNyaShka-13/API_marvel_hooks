@@ -1,7 +1,7 @@
 import {useHttp} from '../hooks/http.hooks';
 
 const useMarvelService = () => {//Такое название, чтобы было понятно, что это кастомный хук
-    const {loading, request, error} = useHttp();
+    const {loading, request, error, clearError} = useHttp();
 
     const _apiBase = 'https://gateway.marvel.com:443/v1/public/';//Оптимизируем ссылки, так как мы часто будем их использовать и код часто повторяется, легче повторяющиеся куски кода вынести, но ссылки тогда будут динамическими и нужно использовать ``
     const _apiKey = 'apikey=ea2364b682f4916e26a6de922b3ca993';
@@ -29,7 +29,7 @@ const useMarvelService = () => {//Такое название, чтобы был
         }
     }
 
-    return {loading, error, getAllCharacters, getCharacter}
+    return {loading, error, getAllCharacters, getCharacter, clearError}
 }
 
 export default useMarvelService;
