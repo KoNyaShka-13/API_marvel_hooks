@@ -3,14 +3,12 @@ import PropTypes from 'prop-types';
 
 import Spinner from '../Spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
-import MarvelService from '../../services/MarvelServices';
+import useMarvelService from '../../services/MarvelServices';
 import './charList.scss';
 
 const CharList = (props) => {
 
     const [charList, setCharList] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
@@ -23,8 +21,7 @@ const CharList = (props) => {
 //        offset: 210,//Не путать с отсупом в MarvelServices
 //        charEnded: false,//Значение, когда закончились персонажи
 //    }
-    
-    const marvelService = new MarvelService();
+    const {loading, error, getAllCharacters} = useMarvelService();
 
     useEffect(() => {//useEffect запускается после рендера, по этому нестрашно, если он находится выше запроса, что в нем находится
         onRequest();
@@ -34,15 +31,12 @@ const CharList = (props) => {
     //   this.onRequest();//Код один и тот же, по этому данный компонент вызывает onReaquest, но без отступа offset, аргумент будет пустой и использоваться, что задан раньше в MarvelServices
     //}
 
-    const onRequest = (offset) => {//Запрос с нужными отступами, которые можно изменять по мере необходимости
-        onCharListLoading();
-        marvelService.getAllCharacters(offset)
+    const onRequest = (offset, initial) => {//Запрос с нужными отступами, которые можно изменять по мере необходимости
+        initial ? setNewItemLoading(false) : setNewItemLoading(true);//Чтобы не обновлялся список героев всегда, даже когда не нужно
+        getAllCharacters(offset)
             .then(onCharListLoaded)
-            .catch(onError)
-    }
-
-    const onCharListLoading = () => {
-        setNewItemLoading(true);
+            
+           
     }
 
     //onCharListLoading = () => {//Начался процесс загрузки
@@ -65,16 +59,13 @@ const CharList = (props) => {
         //    charEnded: ended
         //}))
         setCharList(charList => [...charList, ...newCharList]);//Каждое состояние в данный момент - это отдельная переменная
-        setLoading(loading => false);//Можно через коллбэк функцию, как указано  тут, а можно просто фолс оставить, так как неважно, какое значение было раньше, до обновления в данном случае
+        //setLoading(loading => false);//Можно через коллбэк функцию, как указано  тут, а можно просто фолс оставить, так как неважно, какое значение было раньше, до обновления в данном случае
         setNewItemLoading(newItemLoading => false);
         setOffset(offset => offset + 9);
         setCharEnded(charEnded => ended);
     }
 
-    const onError = () => {
-        setError(true);//Можно писать и так, как тут, и так, как ниже указано
-        setLoading(loading => false);
-    }
+    
 
     //Пример использования ref
     //itemRefs = [];
@@ -132,14 +123,14 @@ const CharList = (props) => {
         const items = renderItems(charList);
 
         const errorMessage = error ? <ErrorMessage/> : null;
-        const spinner = loading ? <Spinner/> : null;
-        const content = !(loading || error) ? items : null;
+        const spinner = loading && !newItemLoading ? <Spinner/> : null;
+        
 
         return (
             <div className="char__list">
                 {errorMessage}
                 {spinner}
-                {content}
+                {items}
                 <button 
                     className="button button__main button__long"
                     disabled={newItemLoading}

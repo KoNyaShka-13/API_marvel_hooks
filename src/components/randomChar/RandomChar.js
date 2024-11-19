@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Spinner from '../Spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
-import MarvelService from '../../services/MarvelServices';
+import useMarvelService from '../../services/MarvelServices';
   
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
@@ -19,11 +19,12 @@ const RandomChar = () => {
     //    wiki: null
 
     const [char, setChar] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
-//    }
+    const  {loading, error, getCharacter} = useMarvelService();//Этим действием создаем новое свойство
 
-    const marvelService = new MarvelService();//Этим действием создаем новое свойство
+    
+
+
+//    const marvelService = new MarvelService();//Этим действием создаем новое свойство
 
     useEffect(() => {
         updateChar();
@@ -35,26 +36,15 @@ const RandomChar = () => {
     }, [])
 
     const onCharLoaded = (char) => { 
-        setLoading(false);
         setChar(char);    
     }
 
-    const onCharLoading = () => {//При вводе имени персонажа добавляем окно загрузки, чтобы окно не пустовало
-        setLoading(true);
-    }
-
-    const onError = () => { 
-        setLoading(false);
-        setError(true);
-    }
+    
 
     const updateChar = () => {//Для получения рандомного героя 
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);//Рандомайзер
-        onCharLoading();
-        marvelService
-            .getCharacter(id)
+        getCharacter(id)
             .then(onCharLoaded)//Получаем данные при помощи кода, что в MarbelServices
-            .catch(onError);//Ловим ошибку и срабатывает функция onError
     }
     
     //render() {//В этой части логика

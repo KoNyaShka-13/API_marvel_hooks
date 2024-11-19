@@ -1,30 +1,23 @@
-class MarvelService {
-_apiBase = 'https://gateway.marvel.com:443/v1/public/';//Оптимизируем ссылки, так как мы часто будем их использовать и код часто повторяется, легче повторяющиеся куски кода вынести, но ссылки тогда будут динамическими и нужно использовать ``
-_apiKey = 'apikey=ea2364b682f4916e26a6de922b3ca993';
-_baseOffset = 210;//Базовый отступ для персонажей
+import {useHttp} from '../hooks/http.hooks';
 
+const useMarvelService = () => {//Такое название, чтобы было понятно, что это кастомный хук
+    const {loading, request, error} = useHttp();
 
-    getResource = async (url) => {
-        let res = await fetch(url);
+    const _apiBase = 'https://gateway.marvel.com:443/v1/public/';//Оптимизируем ссылки, так как мы часто будем их использовать и код часто повторяется, легче повторяющиеся куски кода вынести, но ссылки тогда будут динамическими и нужно использовать ``
+    const _apiKey = 'apikey=ea2364b682f4916e26a6de922b3ca993';
+    const _baseOffset = 210;//Базовый отступ для персонажей
 
-        if (!res.ok) {
-            throw new Error(`Could not feth ${url}, status: ${res.status}`);
-        }
-
-        return await res.json();
+    const getAllCharacters = async (offset = _baseOffset) => {//Получаем сразу всех персонажей, в ссылке, указанной ниже можно изменять некоторые параметры, к примеру такие, как количество показываемых карточек и лимит
+        const res = await request(`${_apiBase}characters?limit=9&offset=${offset}&${_apiKey}`);//Пример оптимизации кода//getResource убираем и на его место ставим request
+        return res.data.results.map(_transformCharacter);
     }
 
-    getAllCharacters = async (offset = this._baseOffset) => {//Получаем сразу всех персонажей, в ссылке, указанной ниже можно изменять некоторые параметры, к примеру такие, как количество показываемых карточек и лимит
-        const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=${offset}&${this._apiKey}`);//Пример оптимизации кода
-        return res.data.results.map(this._transformCharacter);
+    const getCharacter = async (id) => {//Получаем одного персонажа//Для работы метода подставляем const и убираем this
+        const res = await request(`${_apiBase}characters/${id}?${_apiKey}`);
+        return _transformCharacter(res.data.results[0]);
     }
 
-    getCharacter = async (id) => {//Получаем одного персонажа
-        const res = await this.getResource(`https://gateway.marvel.com:443/v1/public/characters/${id}?apikey=ea2364b682f4916e26a6de922b3ca993`);
-        return this._transformCharacter(res.data.results[0]);
-    }
-
-    _transformCharacter = (char) => {//Перекинули метод сюда, так как он будет много где применяться
+    const _transformCharacter = (char) => {//Перекинули метод сюда, так как он будет много где применяться
         return {
             id: char.id,
             name: char.name,
@@ -35,6 +28,8 @@ _baseOffset = 210;//Базовый отступ для персонажей
             comics: char.comics.items
         }
     }
+
+    return {loading, error, getAllCharacters, getCharacter}
 }
 
-export default MarvelService;
+export default useMarvelService;
