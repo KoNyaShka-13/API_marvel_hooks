@@ -26,6 +26,7 @@ const CharInfo = (props) => {
         if(!charId) {
             return;
         }
+        
         clearError();
         getCharacter(charId)
             .then(onCharLoaded)
