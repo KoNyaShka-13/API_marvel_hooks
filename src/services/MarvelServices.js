@@ -22,7 +22,7 @@ const useMarvelService = () => {//Такое название, чтобы был
 		return res.data.results.map(_transformComics);
 	}
 
-	const getComics = async (id) => {//Получаем один комикс
+	const getComic = async (id) => {//Получаем один комикс
 		const res = await request(`${_apiBase}comics/${id}?${_apiKey}`);
 		return _transformComics(res.data.results[0]);
 	}
@@ -63,7 +63,7 @@ const useMarvelService = () => {//Такое название, чтобы был
 		getAllCharacters,
 		getCharacter,
 		getAllComics,
-		getComics,
+		getComic,
 	};
 }
 
