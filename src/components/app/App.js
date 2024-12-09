@@ -1,7 +1,14 @@
+import {lazy, Suspense} from 'react';//Саспенс нужен для отлова ошибок
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 
-import {MainPage, ComicsPage, Page404, SingleComicPage} from '../pages';
 import AppHeader from "../appHeader/AppHeader";
+import Spinner from '../Spinner/Spinner';
+//Динамческие импорты всегда подгружают после статических
+const Page404 = lazy(() => import('../pages/404'));//Ленивая загрузка нужна, когда кода много, для оптимизации. В моем случае - отработка практики 
+const MainPage = lazy(() => import('../pages/MainPage'));//В динамический импорт можно положить и главную страницу, т.к. обычно, на нее редко заходят, а сразу отправляются в другие разделы
+const ComicsPage = lazy(() => import('../pages/ComicsPage'));
+const SingleComicPage = lazy(() => import('../pages/SingleComicPage'));
+
 
 const App = () => {
     
@@ -10,12 +17,14 @@ const App = () => {
             <div className="app">
                 <AppHeader/>
                 <main>
-                    <Routes>
-                        <Route path="/comics" element={<ComicsPage/>}/>
-                        <Route path="/" element={<MainPage/>}/>
-                        <Route path="/comics/:comicId" element={<SingleComicPage/>}/>
-                        <Route path='*' element={<Page404/>}></Route>
-                    </Routes>
+                    <Suspense fallback={<Spinner/>}>
+                        <Routes>
+                            <Route path="/comics" element={<ComicsPage/>}/>
+                            <Route path="/" element={<MainPage/>}/>
+                            <Route path="/comics/:comicId" element={<SingleComicPage/>}/>
+                            <Route path='*' element={<Page404/>}></Route>
+                        </Routes>
+                    </Suspense>
                 </main>
             </div>
         </Router>
