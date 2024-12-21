@@ -9,7 +9,7 @@ const MainPage = lazy(() => import('../pages/MainPage'));//В динамичес
 const ComicsPage = lazy(() => import('../pages/ComicsPage'));
 const SingleComicPage = lazy(() => import('../pages/SingleComicPage'));
 
-
+//React transition  на router v.6 будет работать, если установить key  и in, обьяснение есть в вопросах 181 урока
 const App = () => {
     
     return (
