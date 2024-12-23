@@ -60,9 +60,9 @@ const CharList = (props) => {
         //}))
         setCharList(charList => [...charList, ...newCharList]);//Каждое состояние в данный момент - это отдельная переменная
         //setLoading(loading => false);//Можно через коллбэк функцию, как указано  тут, а можно просто фолс оставить, так как неважно, какое значение было раньше, до обновления в данном случае
-        setNewItemLoading(newItemLoading => false);
-        setOffset(offset => offset + 9);
-        setCharEnded(charEnded => ended);
+        setNewItemLoading(false);
+        setOffset(offset + 9);
+        setCharEnded(ended);
     }
 
     
@@ -118,8 +118,6 @@ const CharList = (props) => {
         )
     }
 
-    
-        
         const items = renderItems(charList);
 
         const errorMessage = error ? <ErrorMessage/> : null;
