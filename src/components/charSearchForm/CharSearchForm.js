@@ -38,11 +38,13 @@ const CharSearchForm = () => {
     return (
         <div className="char__search-form">
             <Formik
-                initialValues = {{
+                initialValues = {{//Базовые значени
                     charName: ''
                 }}
-                validationSchema = {Yup.object({
-                    charName: Yup.string().required('This field is required')
+                validationSchema = {Yup.object({//Валидация
+                    charName: Yup.string()
+                    .min(2, 'Minimum 2 chars reqired')
+                    .required('This field is required')
                 })}
                 onSubmit = { ({charName}) => {
                     updateChar(charName);
