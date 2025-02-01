@@ -10,21 +10,21 @@ import AppBanner from "../appBanner/AppBanner";
 const SinglePage = ({Component, dataType}) => {
     const {id} = useParams();
     const [data, setData] = useState(null);
-    const {loading, error, getComic, clearError} = useMarvelService();
+    const {loading, error, getComic, clearError, getCharacter} = useMarvelService();
 
     useEffect(() => {
         updateData()
     }, [id])
-
+    
     const updateData = () => {
         clearError();
         //Условия для комиксов и персонажей через свич для уменьшения количества строк
         switch (dataType) {
-            case 'comic':
-                getComic(id).then(onDataLoaded);
-                break;
             case 'character':
                 getCharacter(id).then(onDataLoaded);
+                break;
+            case 'comic':
+                getComic(id).then(onDataLoaded);
         }
     }
 
