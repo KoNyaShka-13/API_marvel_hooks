@@ -12,6 +12,11 @@ const useMarvelService = () => {//Такое название, чтобы был
         return res.data.results.map(_transformCharacter);
     };
 
+	const getCharacterByName = async (name) => {//Поиск по имени для формы
+		const res = await request(`${_apiBase}characters?name=${name}&${_apiKey}`);
+		return res.data.results.map(_transformCharacter);
+	};
+
     const getCharacter = async (id) => {//Получаем одного персонажа//Для работы метода подставляем const и убираем this
         const res = await request(`${_apiBase}characters/${id}?${_apiKey}`)
         return _transformCharacter(res.data.results[0]);
@@ -64,6 +69,7 @@ const useMarvelService = () => {//Такое название, чтобы был
 		getCharacter,
 		getAllComics,
 		getComic,
+		getCharacterByName,
 	};
 }
 
